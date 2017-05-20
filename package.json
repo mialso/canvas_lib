@@ -1,0 +1,16 @@
+{
+  "name": "canvas_lib",
+  "version": "0.0.1",
+  "description": "canvas library",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mialso",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "3.19.0",
+    "eslint-config-airbnb-base": "11.2.0",
+    "eslint-plugin-import": "2.2.0"
+  }
+}
