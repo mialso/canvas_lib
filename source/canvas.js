@@ -1,22 +1,21 @@
-;(function(glob) {
-  'use strict'
+// eslint-disable-next-line no-extra-semi, func-names
+;(function (glob) {
+  'use strict';
 
-  if (!glob.reqApp) glob.reqApp = {};
+  const canvasLib = glob.reqApp.canvas;
 
-  function createCanvas ({width = 256, height = 256, parent}) {
-    const canvas;
-    canvas = document.createElement("canvas");
-    canvas.setAttribute("width", width);
-    canvas.setAttribute("height", height);
+  function createCanvas({ width = 256, height = 256, parent }) {
+    const canvas = glob.document.createElement('canvas');
+    canvas.setAttribute('width', width);
+    canvas.setAttribute('height', height);
     if (parent) {
-      document.querySelector(parent).appendChild(canvas);
+      glob.document.querySelector(parent).appendChild(canvas);
     } else {
-      document.body.appendChild(canvas);
+      glob.document.body.appendChild(canvas);
     }
-    canvas.ctx = canvas.getContext("2d");
+    canvas.ctx = canvas.getContext('2d');
     return canvas;
   }
 
-  glob.reqApp.canvas.createCanvas = createCanvas
-
-})(self);
+  canvasLib.createCanvas = createCanvas;
+}(self));

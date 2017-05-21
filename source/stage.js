@@ -1,11 +1,83 @@
-;(function(glob) {
-  'use strict'
+// eslint-disable-next-line no-extra-semi, func-names
+;(function (glob) {
+  'use strict';
+
   const canvasLib = glob.reqApp.canvas;
   const buttons = [];
   const draggableSprites = [];
 
+  function makeInteractive(o) {
+    o.press = o.press || undefined;
+    o.release = o.release || undefined;
+    o.over = o.over || undefined;
+    o.out = o.out || undefined;
+    o.tap = o.tap || undefined;
+
+    o.state = 'up';
+    // tells whether 'pressed' or 'released'
+    o.action = '';
+    o.pressed = false;
+    o.hoverOver = false;
+    o.update = (pointer) => {
+      const hit = pointer.hitTestSprite(o);
+      if (pointer.isUp) {
+        o.state = 'up';
+        if (o instanceof canvasLib.sprite.Button) o.gotoAndStop(0);
+      }
+      if (hit) {
+        o.state = 'over';
+        if (o.frames && o.frames.length === 3 && o instanceof canvasLib.sprite.Button) {
+          o.gotoAndStop(1);
+        }
+        if (pointer.isDown) {
+          o.state = 'down';
+          if (o instanceof canvasLib.sprite.Button) {
+            if (o.frames.length === 3) {
+              o.gotoAndStop(2);
+            } else {
+              o.gotoAndStop(1);
+            }
+          }
+        }
+      }
+      // run the 'press' method if sprite state is 'down' and hasn't already been pressed
+      if (o.state === 'down') {
+        if (!o.pressed) {
+          if (o.press) o.press();
+          o.pressed = true;
+          o.action = 'pressed';
+        }
+      }
+      // run the 'release' method if sprite state is 'over' and has been pressed
+      if (o.state === 'over') {
+        if (o.pressed) {
+          if (o.release) o.release();
+          o.pressed = false;
+          o.action = 'released';
+          if (pointer.tapped && o.tap) o.tap();
+        }
+        if (!o.hoverOver) {
+          if (o.over) o.over();
+          o.hoverOver = true;
+        }
+      }
+      // check pointer release outside the sprite's area
+      if (o.state === 'up') {
+        if (o.pressed) {
+          if (o.release) o.release();
+          o.pressed = false;
+          o.action = 'released';
+        }
+        if (o.hoverOver) {
+          if (o.out) o.out();
+          o.hoverOver = false;
+        }
+      }
+    };
+  }
+
   class DisplayObject {
-    constructor (properties) {
+    constructor() {
       // position and size
       this.x = 0;
       this.y = 0;
@@ -24,13 +96,13 @@
       this.vx = 0;
       this.vy = 0;
 
-      this._layer;
+      this._layer = null;
 
       this.children = [];
-      this.parent;
+      this.parent = null;
       // shadow properties
       this.shadow = false;
-      this.shadowColor = "rgba(100, 100, 100, 0.5)";
+      this.shadowColor = 'rgba(100, 100, 100, 0.5)';
       this.shadowOffsetX = 3;
       this.shadowOffsetY = 3;
       this.shadowBlur = 3;
@@ -47,113 +119,131 @@
       this._circular = false;
       this._interactive = false;
     }
-    get gx () {
+
+    get gx() {
       if (this.parent) {
         return this.x + this.parent.gx;
-      } else {
-        return this.x;
       }
+      return this.x;
     }
-    get gy () {
+
+    get gy() {
       if (this.parent) {
         return this.y + this.parent.gy;
-      } else {
-        return this.y;
       }
+      return this.y;
     }
-    get layer () {
+
+    get layer() {
       return this._layer;
     }
-    set layer (value) {
+
+    set layer(value) {
       this._layer = value;
       if (this.parent) {
         this.parent.children.sort((a, b) => a.layer - b.layer);
       }
     }
-    addChild (sprite) {
+
+    addChild(sprite) {
       if (sprite.parent) {
         sprite.parent.removeChild(sprite);
       }
       sprite.parent = this;
       this.children.push(sprite);
     }
-    removeChild (sprite) {
+
+    removeChild(sprite) {
       if (sprite.parent === this) {
         this.children.splice(this.children.indexOf(sprite), 1);
       } else {
-        throw new Error(sprite + "is not a child of " + this);
+        throw new Error(`${sprite} + is not a child of  + ${this}`);
       }
     }
-    get halfWidth () {
+
+    get halfWidth() {
       return this.width / 2;
     }
-    get halfHeight () {
+
+    get halfHeight() {
       return this.height / 2;
     }
-    get centerX () {
+
+    get centerX() {
       return this.x + this.halfWidth;
     }
-    get centerY () {
+
+    get centerY() {
       return this.y + this.halfHeight;
     }
-    get position () {
-      return {x: this.x, y: this.y};
+
+    get position() {
+      return { x: this.x, y: this.y };
     }
-    set position ({x, y}) {
+
+    set position({ x, y }) {
       this.x = x;
       this.y = y;
     }
-    get localBounds () {
+
+    get localBounds() {
       return {
         x: 0,
         y: 0,
         width: this.width,
         height: this.height,
-      }
+      };
     }
-    get globalBounds () {
+
+    get globalBounds() {
       return {
         x: this.gx,
         y: this.gy,
         width: this.gx + this.width,
         height: this.gy + this.height,
-      }
+      };
     }
-    get empty () {
+
+    get empty() {
       if (this.children.length === 0) {
         return true;
-      } else {
-        return false;
       }
+      return false;
     }
-    putCenter (b, {xOffset = 0, yOffset = 0}) {
-      let a = this;
-      b.x = (a.x + a.halfWidth - b.halfWidth) + xOffset;
-      b.y = (a.y + a.halfHeight - b.halfHeight) + yOffset;
+
+    putCenter(b, { xOffset = 0, yOffset = 0 }) {
+      const a = this;
+      b.x = (a.x + (a.halfWidth - b.halfWidth)) + xOffset;
+      b.y = (a.y + (a.halfHeight - b.halfHeight)) + yOffset;
     }
-    putTop (b, {xOffset = 0, yOffset = 0}) {
-      let a = this;
-      b.x = (a.x + a.halfWidth - b.halfWidth) + xOffset;
+
+    putTop(b, { xOffset = 0, yOffset = 0 }) {
+      const a = this;
+      b.x = (a.x + (a.halfWidth - b.halfWidth)) + xOffset;
       b.y = (a.y - b.height) + yOffset;
     }
-    putRight (b, {xOffset = 0, yOffset = 0}) {
-      let a = this;
+
+    putRight(b, { xOffset = 0, yOffset = 0 }) {
+      const a = this;
       b.x = (a.x + a.width) + xOffset;
-      b.y = (a.y + a.halfHeight - b.halfHeight) + yOffset;
+      b.y = (a.y + (a.halfHeight - b.halfHeight)) + yOffset;
     }
-    putBottom (b, {xOffset = 0, yOffset = 0}) {
-      let a = this;
-      b.x = (a.x + a.halfWidth - b.halfWidth) + xOffset;
+
+    putBottom(b, { xOffset = 0, yOffset = 0 }) {
+      const a = this;
+      b.x = (a.x + (a.halfWidth - b.halfWidth)) + xOffset;
       b.y = (a.y + a.height) + yOffset;
     }
-    putLeft (b, {xOffset = 0, yOffset = 0}) {
-      let a = this;
+
+    putLeft(b, { xOffset = 0, yOffset = 0 }) {
+      const a = this;
       b.x = (a.x - b.width) + xOffset;
-      b.y = (a.y + a.halfHeight - b.halfHeight) + yOffset;
+      b.y = (a.y + (a.halfHeight - b.halfHeight)) + yOffset;
     }
-    swapChildren (child1, child2) {
-      let index1 = this.children.indexOf(child1),
-          index2 = this.children.indexOf(child2)
+
+    swapChildren(child1, child2) {
+      const index1 = this.children.indexOf(child1);
+      const index2 = this.children.indexOf(child2);
       if (index1 !== -1 && index2 !== -1) {
         child1.childIndex = index2;
         child2.childIndex = index1;
@@ -163,44 +253,49 @@
         throw new Error(`Both objects must be a child of the caller ${this}`);
       }
     }
-    add (...spritesToAdd) {
+
+    add(...spritesToAdd) {
       spritesToAdd.forEach(sprite => this.addChild(sprite));
     }
-    remove (...spritesToRemove) {
+
+    remove(...spritesToRemove) {
       spritesToRemove.forEach(sprite => this.removeChild(sprite));
     }
-    get currentFrame () {
+
+    get currentFrame() {
       return this._currentFrame;
     }
-    get circular () {
+
+    get circular() {
       return this._circular;
     }
-    set circular (value) {
+
+    set circular(value) {
       if (value === true && this._circular === false) {
         Object.defineProperties(this, {
           diameter: {
-            get () {
+            get() {
               return this.width;
             },
-            set (value) {
-              this.width = value;
-              this.height = value;
+            set(val) {
+              this.width = val;
+              this.height = val;
             },
             enumerable: true,
             configurable: true,
           },
           radius: {
-            get () {
+            get() {
               return this.halfWidth;
             },
-            set (value) {
-              this.width = value * 2;
-              this.height = value * 2;
+            set(val) {
+              this.width = val * 2;
+              this.height = val * 2;
             },
             enumerable: true,
             configurable: true,
-          }
-        })
+          },
+        });
         this._circular = true;
       }
 
@@ -210,10 +305,12 @@
         this._circular = false;
       }
     }
-    get draggable () {
+
+    get draggable() {
       return this._draggable;
     }
-    set draggable (value) {
+
+    set draggable(value) {
       if (value === true) {
         draggableSprites.push(this);
         this._draggable = true;
@@ -222,10 +319,12 @@
         draggableSprites.splice(draggableSprites.indexOf(this), 1);
       }
     }
-    get interactive () {
+
+    get interactive() {
       return this._interactive;
     }
-    set interactive (value) {
+
+    set interactive(value) {
       if (value === true) {
         makeInteractive(this);
         buttons.push(this);
@@ -237,79 +336,9 @@
       }
     }
   }
-  
-  function makeInteractive (o) {
-    o.press = o.press || undefined;
-    o.release = o.release || undefined;
-    o.over =  o.over || undefined;
-    o.out = o.out || undefined;
-    o.tap = o.tap || undefined;
-
-    o.state = "up";
-    // tells whether 'pressed' or 'released'
-    o.action = "";
-    o.pressed = false;
-    o.hoverOver = false;
-    o.update = (pointer, canvas) => {
-      let hit = pointer.hitTestSprite(o);
-      if (pointer.isUp) {
-        o.state = "up";
-        if (o instanceof canvasLib.sprite.Button) o.gotoAndStop(0);
-      }
-      if (hit) {
-        o.state = "over";
-        if (o.frames && o.frames.length === 3 && o instanceof canvasLib.sprite.Button) {
-          o.gotoAndStop(1);
-        }
-        if (pointer.isDown) {
-          o.state = "down";
-          if (o instanceof canvasLib.sprite.Button) {
-            if (o.frames.length === 3) {
-              o.gotoAndStop(2);
-            } else {
-              o.gotoAndStop(1);
-            }
-          }
-        }
-      }
-      // run the 'press' method if sprite state is 'down' and hasn't already been pressed
-      if (o.state === "down") {
-        if (!o.pressed) {
-          if (o.press) o.press();
-          o.pressed = true;
-          o.action = "pressed";
-        }
-      }
-      // run the 'release' method if sprite state is 'over' and has been pressed
-      if (o.state === "over") {
-        if (o.pressed) {
-          if (o.release) o.release();
-          o.pressed = false;
-          o.action = "released";
-          if (pointer.tapped && o.tap) o.tap();
-        }
-        if (!o.hoverOver) {
-          if (o.over) o.over();
-          o.hoverOver = true;
-        }
-      }
-      // check pointer release outside the sprite's area
-      if (o.state === "up") {
-        if (o.pressed) {
-          if (o.release) o.release();
-          o.pressed = false;
-          o.action = "released";
-        }
-        if (o.hoverOver) {
-          if (o.out) o.out();
-          o.hoverOver = false;
-        }
-      }
-    }
-  }
 
   canvasLib.stage = new DisplayObject();
   canvasLib.DisplayObject = DisplayObject;
   canvasLib.buttons = buttons;
   canvasLib.draggableSprites = draggableSprites;
-})(self);
+}(self));

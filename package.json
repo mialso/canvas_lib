@@ -4,6 +4,10 @@
   "description": "canvas library",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint \"source/**/*.js\"",
+    "book": "gitbook serve",
+    "clean-up": "ls public > /dev/null 2>&1 || mkdir public",
+    "build": "npm run lint && npm run clean-up && cat ./source/index.js ./source/*.js ./source/control/*.js ./source/sprite/*.js > public/canvas_lib.js || exit 0",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mialso",
@@ -11,6 +15,7 @@
   "devDependencies": {
     "eslint": "3.19.0",
     "eslint-config-airbnb-base": "11.2.0",
-    "eslint-plugin-import": "2.2.0"
+    "eslint-plugin-import": "2.2.0",
+    "gitbook-cli": "2.3.0"
   }
 }
