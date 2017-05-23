@@ -164,23 +164,17 @@
       },
     };
     element.addEventListener(
-      'mousemove', pointer.moveHandler.bind(pointer), false,
-    );
+      'mousemove', pointer.moveHandler.bind(pointer), false);
     element.addEventListener(
-      'mousedown', pointer.downHandler.bind(pointer), false,
-    );
+      'mousedown', pointer.downHandler.bind(pointer), false);
     glob.addEventListener(
-      'mouseup', pointer.upHandler.bind(pointer), false,
-    );
+      'mouseup', pointer.upHandler.bind(pointer), false);
     element.addEventListener(
-      'touchmove', pointer.touchMoveHandler.bind(pointer), false,
-    );
+      'touchmove', pointer.touchMoveHandler.bind(pointer), false);
     element.addEventListener(
-      'touchstart', pointer.touchStartHandler.bind(pointer), false,
-    );
+      'touchstart', pointer.touchStartHandler.bind(pointer), false);
     glob.addEventListener(
-      'touchend', pointer.touchEndHandler.bind(pointer), false,
-    );
+      'touchend', pointer.touchEndHandler.bind(pointer), false);
     element.style.touchAction = 'none';
 
     return pointer;

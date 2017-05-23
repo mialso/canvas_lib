@@ -14,9 +14,7 @@
       y = 0,
     }) {
       super();
-      Object.assign(
-        this, { width, height, fillStyle, strokeStyle, lineWidth, x, y },
-      );
+      Object.assign(this, { width, height, fillStyle, strokeStyle, lineWidth, x, y });
       this.mask = false;
     }
     render(ctx) {
@@ -28,8 +26,7 @@
         -this.width * this.pivotX,
         -this.height * this.pivotY,
         this.width,
-        this.height,
-      );
+        this.height);
       if (this.strokeStyle !== 'none') ctx.stroke();
       if (this.fillStyle !== 'none') ctx.fill();
       if (this.mask && this.mask === true) ctx.clip();

@@ -27,16 +27,9 @@
       this.height = ctx.measureText('M').width;
       // if (this.height === 0) this.height = ctx.measureText("M").width
 
-      ctx.translate(
-        -this.width * this.pivotX,
-        -this.height * this.pivotY,
-      );
+      ctx.translate(-this.width * this.pivotX, -this.height * this.pivotY);
       ctx.textBaseline = this.textBaseline;
-      ctx.fillText(
-        this.content,
-        0,
-        0,
-      );
+      ctx.fillText(this.content, 0, 0);
       if (this.strokeText !== 'none') ctx.strokeText();
     }
   }

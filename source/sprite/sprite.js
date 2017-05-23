@@ -135,8 +135,7 @@
         this.sourceWidth, this.sourceHeight,
         -this.width * this.pivotX,
         -this.height * this.pivotY,
-        this.width, this.height,
-      );
+        this.width, this.height);
     }
   }
   function sprite(configObject, stage) {

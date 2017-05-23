@@ -29,8 +29,7 @@
         this.radius,
         0,
         2 * Math.PI,
-        false,
-      );
+        false);
       if (this.strokeStyle !== 'none') ctx.stroke();
       if (this.fillStyle !== 'none') ctx.fill();
       if (this.mask && this.mask === true) ctx.clip();

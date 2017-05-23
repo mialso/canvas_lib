@@ -27,8 +27,7 @@
         ctx.save();
         ctx.translate(
           sprite.x + (sprite.width * sprite.pivotX),
-          sprite.y + (sprite.height * sprite.pivotY),
-        );
+          sprite.y + (sprite.height * sprite.pivotY));
         ctx.rotate(sprite.rotation);
         ctx.globalAlpha = sprite.alpha * sprite.parent.alpha;
         ctx.scale(sprite.scaleX, sprite.scaleY);

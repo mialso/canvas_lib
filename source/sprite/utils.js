@@ -77,10 +77,7 @@
   }
 
   function getAngle(s1, s2) {
-    return Math.atan2(
-      s2.centerY - s1.centerY,
-      s2.centerX - s1.centerX,
-    );
+    return Math.atan2(s2.centerY - s1.centerY, s2.centerX - s1.centerX);
   }
 
   function rotateSprite({

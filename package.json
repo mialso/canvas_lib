@@ -7,7 +7,7 @@
     "lint": "eslint \"source/**/*.js\"",
     "book": "gitbook serve",
     "clean-up": "ls public > /dev/null 2>&1 || mkdir public",
-    "build": "npm run lint && npm run clean-up && cat ./source/index.js ./source/*.js ./source/control/*.js ./source/sprite/*.js > public/canvas_lib.js || exit 0",
+    "build": "npm run lint && npm run clean-up && cat ./source/index.js ./source/common/*.js ./source/control/*.js ./source/sprite/sprite.js ./source/sprite/*.js > public/canvas_lib.js || exit 0",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "mialso",
