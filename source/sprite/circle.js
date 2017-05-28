@@ -42,4 +42,5 @@
     return sprite;
   }
   canvasLib.sprite.circle = circle;
+  canvasLib.sprite.Circle = Circle;
 }(self));

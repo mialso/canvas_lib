@@ -10,10 +10,11 @@
       fillStyle = 'red',
       x = 0,
       y = 0,
+      baseLine = '',
     }) {
       super();
       Object.assign(this, { content, font, fillStyle, x, y });
-      this.textBaseline = 'top';
+      this.textBaseline = baseLine || 'top';
       this.strokeText = 'none';
     }
     render(ctx) {
@@ -40,5 +41,6 @@
     return sprite;
   }
   canvasLib.sprite.text = text;
+  canvasLib.sprite.Text = Text;
 }(self));
 

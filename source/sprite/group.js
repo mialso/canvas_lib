@@ -48,4 +48,5 @@
     return sprite;
   }
   canvasLib.sprite.group = group;
+  canvasLib.sprite.Group = Group;
 }(self));

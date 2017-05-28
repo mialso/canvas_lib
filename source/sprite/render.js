@@ -11,7 +11,7 @@
   }
 
   function render(canvas, stage) {
-    const ctx = canvas.ctx;
+    const ctx = canvas.getContext('2d');
     if (typeof stage !== 'object') {
       throw new Error('[ERROR]: <canvasLib>: render(): no stage provided');
     }
